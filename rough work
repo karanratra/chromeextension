@@ -1,0 +1,112 @@
+rough work 
+
+http://talks.codegram.com/creating-basic-chrome-extensions#/browser_action_example_4
+
+http://blog.hartleybrody.com/chrome-extension/
+
+http://blog.hartleybrody.com/chrome-extension/
+
+http://www.aramex.com/developers/aramex-apis
+
+http://blog.programmableweb.com/2007/11/08/5-apis-to-track-your-packages/
+
+https://stackoverflow.com/questions/8375952/is-there-shipment-tracking-api-mashups
+
+http://www.dhl-usa.com/en/express/tracking/tracking_tools.html
+
+https://github.com/mikechambers/as3corelib
+
+https://www.youtube.com/watch?v=DMZcVwy2K4s
+
+http://www.wix.com/website/templates
+
+http://www.wix.com/website/templates/html/all/6
+
+<!-- <script src="popup.js"></script>-->
+    <iframe width="600" height="450" frameborder="0" style="border:0" src="https://www.google.com/maps/embed/v1/directions?origin=bangalore&destination=bangalore&key=AIzaSyBz19LRSYBrL-O0B_t9tLbn5Ks0bQLPbc4"></iframe>
+
+
+function doMagic(tab) {
+  chrome.tabs.update(tab.id, { url: 'http://www.google.com' });
+}
+chrome.browserAction.onClicked.addListener(doMagic);
+
+chrome.browserAction.onClicked.addListener(function(tab) {
+    chrome.tabs.getSelected(null,function(tab) {
+        chrome.tabs.create( { url: "http://w3patrol.com/search.php?q=" +tab.url } );
+    });
+});
+
+      https://secure.flickr.com/services/rest/?method=flickr.photos.search&api_key=90485e931f687a9b9c2a66bf58a3861a&text=puppies&safe_search=1&content_type=1&sort=interestingness-desc&per_page=20
+
+
+
+      <!doctype html>
+<html>
+  <head>
+    <title>Getting Started Extension's Popup</title>
+    <style>
+      body {
+        min-width: 357px;
+        overflow-x: hidden;
+      }
+
+      img {
+        margin: 5px;
+        border: 2px solid black;
+        vertical-align: middle;
+        width: 75px;
+        height: 75px;
+      }
+    </style>
+ </head>
+  <body >
+    <!--<script src="popup.js"></script>-->
+    <div class="gwd-div-8ilh editable">My Epal
+       <button id="mybutton">click me</button>
+    <a href="http://www.w3schools.com">Visit W3Schools</a>
+
+</div>
+
+   <div  width="600" height="450" frameborder="0" style="border:0" onClick="alert(1);">
+         <a href='Karan' onClick="doMagic()">
+    </div>
+  </body>
+</html>
+
+function doMagic()
+{
+    alert('extension button clicked!!');
+}
+
+chrome.extension.onClicked.addListener(doMagic);
+
+chrome.tabs.getSelected(null, function(tab) {
+  // When the browser action is clicked, set the popup for |tab|.
+  chrome.browserAction.onClicked.addListener(function(tab) {
+    chrome.browserAction.setPopup({
+      tabId: tab.id,          // Set the new popup for this tab.
+      popup: 'karan_pop_up.html'   // Open this html file within the popup.
+    });
+  });
+});
+
+
+<html>
+    <head>
+     
+    </head>
+
+    <body>
+
+
+      <iframe src="//www.facebook.com/plugins/like.php?href=http%3A%2F%2Fwww.techmangoes.com%2F&amp;width=450&amp;layout=standard&amp;action=like&amp;show_faces=true&amp;share=true&amp;height=80" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:450px; height:80px;" allowTransparency="true"></iframe>
+
+               <table><tr><td>
+            Hello...
+</td>
+<td> </div></td>
+</tr>
+</table>
+    </body>
+</html>

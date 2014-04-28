@@ -1,0 +1,912 @@
+// manifest.json
+
+{
+  "name": "My First Extension",
+  "version": "1.0",
+  "description": "The first extension that I made.",
+  "browser_action": {
+    "default_icon": "icon.png",	
+	"popup": "popup.html"
+  },
+  "permissions": [
+    "http://api.flickr.com/"
+  ]
+}
+
+
+// another one 
+
+{
+  "name": "My Extension",
+  "version": "2.1",
+  "description": "Gets information from Google.",
+  "icons": { "128": "icon_128.png" },
+  "background_page": "bg.html",
+  "permissions": ["http://*.google.com/", "https://*.google.com/"],
+  "browser_action": {
+    "default_title": "",
+    "default_icon": "icon_19.png",
+    "default_popup": "popup.html"
+  }
+}
+------------------------------------------------------------------------
+	chrome.tabs.create() or window.open() to display HTML files
+------------------------------------------------------------------------
+Content scripts
+------------------------------------------------------------------------
+Communication between pages
+
+use chrome.extension methods such as getViews() and getBackgroundPage()
+------------------------------------------------------------------------
+incognito mode
+
+	var bgPage = chrome.extension.getBackgroundPage();
+
+	function saveTabData(tab, data) {
+	  if (tab.incognito) {
+		bgPage[tab.url] = data;       // Persist data ONLY in memory
+	  } else {
+		localStorage[tab.url] = data; // OK to store data
+	}
+------------------------------------------------------------------------
+// debugging
+
+	location.reload(true)
+	console.log("Hello, world!")
+	console.error()
+
+------------------------------------------------------------------------
+// Browser Actions
+
+{
+  "name": "My extension",
+  ...
+  "browser_action": {
+    "default_icon": "images/icon19.png", // required
+    "default_title": "Google Mail",      // optional; shown in tooltip
+    "default_popup": "popup.html"        // optional
+  },
+  ...
+}
+
+Icon : 19px, To set the icon, use the default_icon field of browser_action in the manifest, or call the setIcon() method.
+
+Tooltip : To set the tooltip, use the default_title field of browser_action in the manifest, or call the setTitle() method.
+
+Badge : a bit of text that is layered over the icon.
+	it should have 4 characters or less.
+	Set the text and color of the badge using setBadgeText() and setBadgeBackgroundColor(), respectively.
+
+Popup : Specify the HTML file in the default_popup field of browser_action in the manifest, or call the setPopup() method.
+ 
+
+------------------------------------------------------------------------
+chrome.browserAction API reference
+chrome.browserAction.
+
+.setBadgeBackgroundColor(object details)
+	color ( array of integer )
+	tabId ( optional integer )
+
+.setBadgeText(object details)
+	text ( string )
+	tabId ( optional integer )
+
+.setIcon(object details)
+	imageData ( optional ImageData )
+	path ( optional string )
+	tabId ( optional integer )
+
+.setPopup(object details)
+	tabId ( optional integer )
+	popup ( string )
+
+.setTitle(object details)
+	title ( string )
+	tabId ( optional integer )
+
+.onClicked.addListener(function(Tab tab) {...});			// This event will not fire if the browser action has a popup
+	tab ( Tab )
+	
+
+
+------------------------------------------------------------------------
+Manifest Files
+
+{
+  // Required
+  "name": "My Extension",
+  "version": "versionString",
+
+  // Recommended
+  "description": "A plain text description",
+  "icons": { ... },
+  "default_locale": "en",
+
+  // Pick one (or none)
+  "browser_action": {...},
+  "page_action": {...},
+  "theme": {...},
+  "app": {...},
+
+  // Add any of these that you need
+  "background_page": "aFile.html",
+  "chrome_url_overrides": {...},
+  "content_scripts": [...],
+  "homepage_url": "http://path/to/homepage",
+  "incognito": "spanning" or "split",
+  "key": "publicKey",
+  "minimum_chrome_version": "versionString",
+  "omnibox": { "keyword" : "aString" },
+  "options_page": "aFile.html",
+  "permissions": [...],
+  "plugins": [...],
+  "update_url": "http://path/to/updateInfo.xml"
+}
+
+
+
+"icons": { "16": "icon16.png",
+           "48": "icon48.png",
+          "128": "icon128.png" },
+		  
+		  
+"permissions": [
+	"tabs",
+	"bookmarks",
+	"http://www.blogger.com/",
+	"http://*.google.com/",
+	"unlimitedStorage"
+],
+
+"permissions": [
+	"tabs", "http://*/*", "https://*/*"
+],
+
+
+
+		  
+------------------------------------------------------------------------
+Context Menus
+
+"permissions": [
+    "contextMenus"
+],
+  "icons": {
+    "16": "icon-bitty.png",					// you should specify a 16x16-pixel icon for display next to your menu item
+	
+
+	
+integer chrome.contextMenus.create(object createProperties, function callback)
+	type ( optional string )								// The type of menu item - one of 'normal', 'checkbox', 'radio', or 'separator'. Defaults to 'normal' if not specified.
+	title ( optional string )								// This must be specified unless type is 'separator'.
+	checked ( optional boolean )							// This only applies to the initial state of a checkbox or radio item. It indicates if the item should initially be checked/selected. Only one radio item can be selected at a time in a given group of radio items.
+	contexts ( optional array of string )					// List of contexts this menu item will appear in. Legal values are: 'all', 'page', 'selection', 'link', 'editable', 'image', 'video', and 'audio'. Defaults to ['page'].
+	onclick ( optional function )							// A function that will be called back when the menu item is clicked.
+		info ( OnClickData )		// Information about the item clicked and the context where the click happened.
+		tab ( Tab )					// The details of the tab where the click took place.
+	parentId ( optional integer )							// The id of a parent menu item - this makes the item a child of a previously added item.
+	documentUrlPatterns ( optional array of string )		// Lets you restrict the item to only apply to documents whose URL matches one of the given patterns. (This applies to frames as well). For details on the format of a pattern, see Match Patterns.
+	targetUrlPatterns ( optional array of string )			// Similar to documentUrlPatterns, but this lets you filter based on the src attribute of img/audio/video tags and the href of anchor tags.
+
+chrome.contextMenus.remove(integer menuItemId, function callback)
+
+chrome.contextMenus.removeAll(function callback)
+
+chrome.contextMenus.update(integer id, object updateProperties, function callback)
+	type ( optional string )
+	title ( optional string )
+	checked ( optional boolean )
+	contexts ( optional array of string )
+	onclick ( optional function )
+	parentId ( optional integer )
+	Note: You cannot change an item to be a child of one of its own descendants.
+	documentUrlPatterns ( optional array of string )
+	targetUrlPatterns ( optional array of string )
+	
+	
+OnClickData				//Information sent when a context menu item is clicked.
+	menuItemId ( integer )
+	parentMenuItemId ( optional integer )
+	mediaType ( optional string )				// One of 'image', 'video', or 'audio' if the context menu was activated on one of these types of elements.
+	linkUrl ( optional string )					// If the element is a link, the url it points to.
+	srcUrl ( optional string )					// Will be present for elements with a 'src' url.
+	pageUrl ( string )							// The url of the page where the menu item was clicked.
+	frameUrl ( optional string )				// The url of the frame of the element where the context menu was clicked, if it was in a frame.
+	selectionText ( optional string )			// The text for the context selection, if any.
+	editable ( string )							// A flag indicating whether the element is editable (text input, textarea, etc.).	
+	
+	
+
+------------------------------------------------------------------------
+Desktop Notifications
+
+
+ "permissions": [
+    "notifications"
+  ],
+  
+ 
+// Communicating with other views 
+	// Inside a notification...
+	chrome.extension.getBackgroundPage().doThing();
+
+	// From the background page...
+	chrome.extension.getViews({type:"notification"}).forEach(function(win) {
+		win.doOtherThing();
+	});
+	
+
+	
+// Create a simple text notification:
+var notification = webkitNotifications.createNotification(
+  '48.png',  // icon url - can be relative
+  'Hello!',  // notification title
+  'Lorem ipsum...'  // notification body text
+);
+
+// Or create an HTML notification:
+var notification = webkitNotifications.createHTMLNotification(
+  'notification.html'  // html url - can be relative
+);
+
+// Then show the notification.
+notification.show();
+
+notification.ondisplay = function() { ... do something ... };
+notification.onclose = function() { ... do something else ... };
+
+
+------------------------------------------------------------------------
+Options Page
+
+
+"options_page": "options.html",
+
+
+// sample options page
+
+<html>
+<head><title>My Test Extension Options</title></head>
+<script type="text/javascript">
+
+// Saves options to localStorage.
+function save_options() {
+  var select = document.getElementById("color");
+  var color = select.children[select.selectedIndex].value;
+  localStorage["favorite_color"] = color;
+
+  // Update status to let user know options were saved.
+  var status = document.getElementById("status");
+  status.innerHTML = "Options Saved.";
+  setTimeout(function() {
+    status.innerHTML = "";
+  }, 750);
+}
+
+// Restores select box state to saved value from localStorage.
+function restore_options() {
+  var favorite = localStorage["favorite_color"];
+  if (!favorite) {
+    return;
+  }
+  var select = document.getElementById("color");
+  for (var i = 0; i < select.children.length; i++) {
+    var child = select.children[i];
+    if (child.value == favorite) {
+      child.selected = "true";
+      break;
+    }
+  }
+}
+
+</script>
+
+<body onload="restore_options()">
+
+Favorite Color:
+<select id="color">
+ <option value="red">red</option>
+ <option value="green">green</option>
+ <option value="blue">blue</option>
+ <option value="yellow">yellow</option>
+</select>
+
+<br>
+<button onclick="save_options()">Save</button>
+</body>
+</html>
+
+
+
+------------------------------------------------------------------------
+Override Pages
+
+
+{
+  "name": "My extension",
+  ...
+
+  "chrome_url_overrides" : {
+    "pageToOverride": "myPage.html"
+  },
+  ...
+}
+
+pageToOverride = bookmarks or history or newtab
+
+
+------------------------------------------------------------------------
+Page Actions
+
+
+{
+  "name": "My extension",
+  ...
+  "page_action": {
+    "default_icon": "icons/foo.png", // required
+    "default_title": "Do action",    // optional; shown in tooltip
+    "default_popup": "popup.html"    // optional
+  },
+  ...
+}
+
+
+  "content_scripts": [
+    { "matches": ["http://*/*"], "js": ["mappy_content_script.js"] }
+  ],
+
+
+chrome.pageAction.hide(integer tabId)
+chrome.pageAction.setIcon(object details)
+chrome.pageAction.setPopup(object details)
+chrome.pageAction.setTitle(object details)
+chrome.pageAction.show(integer tabId)
+chrome.pageAction.onClicked.addListener(function(Tab tab) {...});
+
+  
+  
+
+------------------------------------------------------------------------
+Bookmarks
+
+
+ "permissions": [
+    "bookmarks"
+  ],
+  
+  
+chrome.bookmarks.create({'parentId': bookmarkBar.id,
+                         'title': 'Extension bookmarks'},
+                        function(newFolder) {
+  console.log("added folder: " + newFolder.title);
+});
+
+
+
+chrome.bookmarks.create({'parentId': extensionsFolderId,
+                         'title': 'Extensions doc',
+                         'url': 'http://code.google.com/chrome/extensions'});
+						 
+						 
+// API						 
+chrome.bookmarks.create(object bookmark, function callback)
+	parentId ( string )
+	index ( optional integer )
+	title ( optional string )
+	url ( optional string )
+	
+chrome.bookmarks.get(string or array of string idOrIdList, function callback)
+	function(array of BookmarkTreeNode results) {...};
+
+chrome.bookmarks.getChildren(string id, function callback)
+	function(array of BookmarkTreeNode results) {...};
+	
+chrome.bookmarks.getRecent(integer numberOfItems, function callback)
+
+chrome.bookmarks.getTree(function callback)
+
+chrome.bookmarks.move(string id, object destination, function callback)
+	id ( string )
+	destination ( object )
+		parentId ( string )
+		index ( optional integer )
+		
+chrome.bookmarks.remove(string id, function callback)
+
+chrome.bookmarks.removeTree(string id, function callback)
+
+chrome.bookmarks.search(string query, function callback)
+
+chrome.bookmarks.update(string id, object changes, function callback)
+
+chrome.bookmarks.onChanged.addListener(function(string id, object changeInfo) {...});
+
+chrome.bookmarks.onChildrenReordered.addListener(function(string id, object reorderInfo) {...});
+
+chrome.bookmarks.onCreated.addListener(function(string id, BookmarkTreeNode bookmark) {...});
+
+chrome.bookmarks.onMoved.addListener(function(string id, object moveInfo) {...});
+
+chrome.bookmarks.onRemoved.addListener(function(string id, object removeInfo) {...});
+
+
+
+
+Types
+BookmarkTreeNode( object )			// A node (either a bookmark or a folder) in the bookmark tree. Child nodes are ordered within their parent folder.
+	id ( string )
+	parentId ( optional string )
+	index ( optional integer )		// The 0-based position of this node within its parent folder.	
+	url ( optional string )
+	title ( string )
+	dateAdded ( optional number )
+	dateGroupModified ( optional number )
+	children ( optional array of BookmarkTreeNode )
+
+
+
+
+	
+------------------------------------------------------------------------
+Events
+
+chrome.tabs.onCreated.addListener(function(tab) {
+  appendToLog('tabs.onCreated --'
+              + ' window: ' + tab.windowId
+              + ' tab: '    + tab.id
+              + ' index: '  + tab.index
+              + ' url: '    + tab.url);
+});
+
+void addListener(function callback(...))
+void removeListener(function callback(...))
+bool hasListener(function callback(...))
+
+
+------------------------------------------------------------------------
+Management
+
+chrome.management.getAll(function callback)
+	function(array of ExtensionInfo result) {...};
+
+chrome.management.launchApp(string id, function callback)
+
+chrome.management.setEnabled(string id, boolean enabled, function callback)
+
+chrome.management.uninstall(string id, function callback)
+
+chrome.management.onDisabled.addListener(function(ExtensionInfo info) {...});
+	info ( ExtensionInfo )
+	
+chrome.management.onEnabled.addListener(function(ExtensionInfo info) {...});
+	info ( ExtensionInfo )
+	
+
+	
+ExtensionInfo				// Information about an installed extension or app.
+	id ( string )
+	name ( string )
+	version ( string )
+	enabled ( boolean )
+	isApp ( boolean )
+	appLaunchUrl ( optional string )
+	optionsUrl ( optional string )
+	icons ( optional array of IconInfo )
+
+	
+------------------------------------------------------------------------
+Tabs
+
+
+"permissions": [
+    "tabs"
+  ],
+  
+  
+chrome.tabs.captureVisibleTab(integer windowId, object options, function callback)
+
+chrome.tabs.create(object createProperties, function callback)
+	windowId ( optional integer )		
+	index ( optional integer )
+	url ( optional string )
+	selected ( optional boolean )
+
+	function(Tab tab) {...};
+	
+chrome.tabs.detectLanguage(integer tabId, function callback)
+
+chrome.tabs.executeScript(integer tabId, object details, function callback)
+	details ( object )
+		code ( optional string )
+		file ( optional string )
+		allFrames ( optional boolean )
+
+chrome.tabs.get(integer tabId, function callback)
+
+chrome.tabs.getAllInWindow(integer windowId, function callback)
+	function(array of Tab tabs) {...};
+	
+chrome.tabs.getCurrent(function callback)				// Gets the tab that this script call is being made from. May be undefined if called from a non-tab context (for example: a background page or popup view).
+	function(Tab tab) {...};
+
+chrome.tabs.getSelected(integer windowId, function callback)
+	function(Tab tab) {...};
+
+chrome.tabs.insertCSS(integer tabId, object details, function callback)
+	details ( object )
+		code ( optional string )
+		file ( optional string )
+		allFrames ( optional boolean )
+
+chrome.tabs.move(integer tabId, object moveProperties, function callback)
+	moveProperties ( object )
+		windowId ( optional integer )
+		index ( integer )
+
+chrome.tabs.remove(integer tabId, function callback)
+
+chrome.tabs.sendRequest(integer tabId, any request, function responseCallback)
+
+chrome.tabs.update(integer tabId, object updateProperties, function callback)
+
+
+
+chrome.tabs.onAttached.addListener(function(integer tabId, object attachInfo) {...});
+
+chrome.tabs.onCreated.addListener(function(Tab tab) {...});
+
+chrome.tabs.onDetached.addListener(function(integer tabId, object detachInfo) {...});
+
+chrome.tabs.onMoved.addListener(function(integer tabId, object moveInfo) {...});
+
+chrome.tabs.onRemoved.addListener(function(integer tabId) {...});
+
+chrome.tabs.onSelectionChanged.addListener(function(integer tabId, object selectInfo) {...});
+
+chrome.tabs.onUpdated.addListener(function(integer tabId, object changeInfo, Tab tab) {...});
+
+
+
+
+
+Tab
+	id ( integer )
+	index ( integer )
+	windowId ( integer )
+	selected ( boolean )
+	url ( string )
+	title ( optional string )
+	favIconUrl ( optional string )
+	status ( optional string )				// Either loading or complete.
+	incognito ( boolean )
+
+
+	
+------------------------------------------------------------------------
+Windows 
+
+{
+  "name": "My extension",
+  ...
+  "permissions": ["tabs"],
+  ...
+}
+
+
+chrome.windows.create(object createData, function callback)
+	url ( optional string )
+	left ( optional integer )
+	top ( optional integer )
+	width ( optional integer )
+	height ( optional integer )
+	incognito ( optional boolean )
+	type ( optional enumerated string ["normal", "popup"] )				// Specifies what type of browser window to create.
+		
+	function(Window window) {...};
+	
+chrome.windows.get(integer windowId, function callback)
+
+chrome.windows.getAll(object getInfo, function callback)
+	function(array of Window windows) {...};
+
+chrome.windows.getCurrent(function callback)
+
+chrome.windows.getLastFocused(function callback)
+
+chrome.windows.remove(integer windowId, function callback)
+
+chrome.windows.update(integer windowId, object updateInfo, function callback)
+
+
+
+chrome.windows.onCreated.addListener(function(Window window) {...});
+
+chrome.windows.onFocusChanged.addListener(function(integer windowId) {...});
+
+chrome.windows.onRemoved.addListener(function(integer windowId) {...});
+
+
+
+Window
+	id ( integer )
+	focused ( boolean )
+	top ( integer )
+	left ( integer )
+	width ( integer )
+	height ( integer )
+	tabs ( optional array of Tab )			// Array of Tab objects representing the current tabs in the window.
+	incognito ( boolean )
+	type ( enumerated string ["normal", "popup", "app"] )
+
+	
+
+------------------------------------------------------------------------
+Content Scripts
+
+// always inject
+{
+  "name": "My extension",
+  ...
+  "content_scripts": [
+    {
+      "matches": ["http://www.google.com/*"],
+      "css": ["mystyles.css"],
+      "js": ["jquery.js", "myscript.js"]
+    }
+  ],
+  ...
+}
+
+matches
+css
+js
+run_at			document_start, document_end, document_idle (default)
+all_frames		true, false (default)
+
+
+
+// Programmatic injection
+
+/* in background.html */
+chrome.browserAction.onClicked.addListener(function(tab) {
+  chrome.tabs.executeScript(null, {code:"document.body.bgColor='red'"});
+});
+
+/* in manifest.json */
+"permissions": [
+  "tabs", "http://*/*"
+],
+
+
+chrome.tabs.executeScript(null, {file: "content_script.js"});
+chrome.tabs.insertCSS();
+
+
+------------------------------------------------------------------------
+Referring to extension files
+
+//Code for displaying <extensionDir>/images/myimage.png:
+var imgURL = chrome.extension.getURL("images/myimage.png");
+document.getElementById("someImage").src = imgURL;
+
+------------------------------------------------------------------------
+Internationalization (i18n)
+
+
+n manifest.json and CSS files, refer to a string named messagename like this:
+	__MSG_messagename__
+In your extension's JavaScript code, refer to a string named messagename like this:
+	chrome.i18n.getMessage("messagename")
+
+
+_locals/en/messages.json
+	{
+	  "search_string": {
+		"message": "hello%20world",
+		"description": "The string we search for. Put %20 between words that go together."
+	  },
+	  ...
+	}
+
+	
+
+------------------------------------------------------------------------
+Predefined messages
+
+@@extension_id
+@@ui_locale
+@@bidi_dir						// ltr or rtl
+@@bidi_reversed_dir				
+@@bidi_start_edge				// left or right
+@@bidi_end_edge
+
+
+// example to use predefined message into CSS
+body {
+  background-image:url('chrome-extension://__MSG_@@extension_id__/background.png');
+  dir: __MSG_@@bidi_dir__;
+}
+
+
+------------------------------------------------------------------------
+Message Passing - Simple one-time requests
+
+contentscript.js
+================
+chrome.extension.sendRequest({greeting: "hello"}, function(response) {
+  console.log(response.farewell);
+});
+
+
+
+background.html
+===============
+chrome.tabs.getSelected(null, function(tab) {
+  chrome.tabs.sendRequest(tab.id, {greeting: "hello"}, function(response) {
+    console.log(response.farewell);
+  });
+});
+
+
+
+receive from contentscript.js and background.html
+=================================================
+chrome.extension.onRequest.addListener(
+  function(request, sender, sendResponse) {
+    console.log(sender.tab ?
+                "from a content script:" + sender.tab.url :
+                "from the extension");
+    if (request.greeting == "hello")
+      sendResponse({farewell: "goodbye"});
+    else
+      sendResponse({}); // snub them.
+  });
+
+------------------------------------------------------------------------
+Message Passing - Long-lived connections
+
+contentscript.js
+================
+var port = chrome.extension.connect({name: "knockknock"});					// from extension use 		chrome.tabs.connect(tabId, {name: "knockknock"}).
+port.postMessage({joke: "Knock knock"});
+port.onMessage.addListener(function(msg) {
+  if (msg.question == "Who's there?")
+    port.postMessage({answer: "Madame"});
+  else if (msg.question == "Madame who?")
+    port.postMessage({answer: "Madame... Bovary");
+});
+
+
+// listener
+chrome.extension.onConnect.addListener(function(port) {						// same for extension and content script 
+  console.assert(port.name == "knockknock");
+  port.onMessage.addListener(function(msg) {
+    if (msg.joke == "Knock knock")
+      port.postMessage({question: "Who's there?"});
+    else if (msg.answer == "Madame")
+      port.postMessage({question: "Madame who?"});
+    else if (msg.answer == "Madame... Bovary")
+      port.postMessage({question: "I don't get it."});
+  });
+});
+
+
+Port.disconnect();
+
+
+
+
+------------------------------------------------------------------------
+Packaged Apps
+
+
+{
+  "name": "My Awesome Racing Game",
+  "description": "Enter a world where a Vanagon can beat a Maserati",
+  "version": "1",
+  "app": {
+    "launch": {
+      "local_path": "main.html"
+    }
+  },
+  "icons": {
+    "16": "icon_16.png",
+    "128": "icon_128.png"
+  },
+  "permissions": [
+    "unlimitedStorage",
+    "notifications"
+  ]
+}
+
+
+local_path
+container			panel or tab (default)
+height
+width
+
+
+
+------------------------------------------------------------------------
+Google Analytics
+
+
+<script>
+     var _gaq = _gaq || [];
+     _gaq.push(['_setAccount', 'UA-XXXXXXXX-X']);
+     _gaq.push(['_trackPageview']);
+
+     (function() {
+       var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+       ga.src = 'https://ssl.google-analytics.com/ga.js';
+       var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+     })();
+</script>
+   
+   
+// Tracking page views
+		_gaq.push(['_trackPageview']);   
+		
+
+// Tracking events
+function trackButton(button_id) {
+    _gaq.push(['_trackEvent', 'button' + button_id, 'clicked']);
+};
+
+------------------------------------------------------------------------
+Match Patterns
+
+
+<url-pattern> := <scheme>://<host><path>
+<scheme> := '*' | 'http' | 'https' | 'file' | 'ftp'
+<host> := '*' | '*.' <any char except '/' and '*'>+
+<path> := '/' <any chars>
+
+
+samples 
+	http://*/*
+	http://*/foo*
+	file:///foo*
+	http://127.0.0.1/*
+	<all_urls>
+
+------------------------------------------------------------------------
+chrome.extension
+
+
+chrome.extension.lastError
+
+chrome.extension.inIncognitoContext
+
+DOMWindow chrome.extension.getBackgroundPage()
+
+string chrome.extension.getURL(string path)
+
+array of DOMWindow chrome.extension.getViews(object fetchProperties)
+	fetchProperties ( optional object )
+		type ( optional enumerated string ["tab", "infobar", "notification", "popup"] )
+		windowId ( optional integer )
+
+
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+// code samples
+
+// change current tab background to red
+chrome.tabs.executeScript(null,
+	{code:"document.body.style.backgroundColor='red'"});
+
+// close pop up window
+window.close();
+
+// check in Incognito Mode
+chrome.extension.inIncognitoContext
+
+
+
